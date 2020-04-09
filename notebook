@@ -194,6 +194,8 @@ Take notes inside the terminal.\n
     notebook -a 'foo' -p 'green'\n
     -c, --clear\t\tClear all the notes.
     -r, --remove\tRemove the line number VALUE.
+    -b, --backup\tMake a backup.
+    -rs, --restore\tRestore notes from backup.
     -h, --help\t\tShow the help.\n
 With no parameters, notebook shows saved notes.\n";
 }
