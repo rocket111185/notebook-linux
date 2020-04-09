@@ -1,0 +1,219 @@
+#!/bin/bash
+
+
+# notebook - Simple script that allows to make notes inside terminal.
+
+
+##### Initialization
+
+filename=~/.local_notes;
+filename_temp=~/.local_notes_temp;
+
+file_exists=$( ls -A ~/ | grep '.local_notes' )
+
+if [[ -z $file_exists ]];
+then
+    touch $filename;
+fi
+
+file_temp_exists=$( ls -A ~/ | grep '.local_notes_temp' )
+
+if [[ -n $file_temp_exists ]];
+then
+    rm $filename_temp;
+fi
+
+##### Variables
+
+
+note=;
+par=;
+to_remove=;
+color="\e[0m";
+line_count=$( wc -l $filename | awk '{ print $1 }' );
+
+
+##### Colors
+
+
+white="\e[0m";
+red="\e[31m";
+green="\e[32m";
+yellow="\e[33m";
+blue="\e[34m";
+magenta="\e[35m";
+cyan="\e[36m";
+
+
+##### Functions
+
+
+write_notes()
+{
+    if [[ -n $note ]];
+    then
+        number=$( printf "$line_count + 1\n" | bc );
+        printf "$number. $color$note$white\n" >> $filename;
+    else
+            printf "You should add non-empty note\n";
+            exit 1;
+    fi
+}
+
+show_notes()
+{
+    if [[ $line_count == "0" ]];
+    then
+        printf "There are no notes.\n"
+    else
+        cat $filename;
+    fi
+}
+
+clear_notes()
+{
+    printf '' > $filename;
+}
+
+
+remove_line()
+{
+    number_mask='^[0-9]+$';
+
+    if ! [[ $to_remove =~ $number_mask ]];
+    then
+        printf "Is \'$to_remove\' an integer?\n";
+        exit 1;
+    elif [ $to_remove -lt 1 ];
+    then
+        printf "The line number must be greater then zero.\n";
+        exit 1;
+    elif [ $to_remove -gt $line_count ];
+    then
+        printf "You've tried to remove line, that doesn't exist.\n";
+        exit 1;
+    fi
+
+    touch $filename_temp;
+
+    i=1;
+
+    while [ $i -lt $to_remove ];
+    do
+        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
+        printf "$i.$line\n" >> $filename_temp;
+        i=$[ $i + 1 ];
+    done
+
+    while [ $i -ne $line_count ];
+    do
+        index=$i;
+        i=$[ $i + 1 ];
+        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
+        printf "$index.$line\n" >> $filename_temp;
+    done
+
+    rm $filename;
+    mv $filename_temp $filename;
+}
+
+choose_color()
+{
+    case $color in
+
+        'white')
+            color=$white;
+        ;;
+        'red')
+            color=$red;
+        ;;
+        'green')
+            color=$green;
+        ;;
+        'yellow')
+            color=$yellow;
+        ;;
+        'blue')
+            color=$blue;
+        ;;
+        'magenta')
+            color=$magenta;
+        ;;
+        'cyan')
+            color=$cyan;
+        ;;
+        *)
+            printf "Possible colors: white, red, green, yellow, blue, magenta, cyan\n";
+            exit 1;
+        ;;
+esac
+}
+
+check_options_overflow()
+{
+    if [[ -n $par ]];
+    then
+        printf "Too much arguments!\n";
+        exit 1;
+    fi
+}
+
+usage()
+{
+printf "Usage: notebook [OPTION] [VALUE]
+Take notes inside the terminal.\n
+    -a, --add\t\tAdd note VALUE.
+    -p, --paint\t\tSet color VALUE.
+               \t\tUse only after -a, for instance:\n
+    notebook -a 'foo' -p 'green'\n
+    -c, --clear\t\tClear all the notes.
+    -r, --remove\tRemove the line number VALUE.
+    -h, --help\t\tShow the help.\n
+With no parameters, notebook shows saved notes.\n";
+}
+
+
+##### Main
+
+
+case $1 in
+
+    '-a' | '--add')
+        shift;
+        note=$1;
+        if [[ $2 == '-p' || $2 == '--paint' ]];
+        then
+            shift;
+            shift;
+            color=$1;
+            choose_color;
+        fi
+        par=$2;
+        check_options_overflow;
+        write_notes;
+        ;;
+    '-r' | '--remove')
+        shift;
+        to_remove=$1;
+        par=$2;
+        check_options_overflow;
+        remove_line;
+        ;;
+    '-c' | '--clear')
+        par=$2;
+        check_options_overflow;
+        clear_notes;
+        ;;
+    '-h' | '--help')
+        par=$2;
+        check_options_overflow;
+        usage;
+        ;;
+    '')
+        show_notes;
+        ;;
+    *)
+        usage;
+        ;;
+
+esac
