@@ -1,13 +1,13 @@
 #!/bin/bash
 
-
-# notebook - Simple script that allows to make notes inside terminal.
+# notebook - A script to make notes inside terminal
 
 
 ##### Initialization
 
 filename=~/.local_notes;
 filename_temp=~/.local_notes_temp;
+filename_backup=~/.local_notes_backup;
 
 file_exists=$( ls -A ~/ | grep '.local_notes' )
 
@@ -158,6 +158,32 @@ check_options_overflow()
     fi
 }
 
+make_backup()
+{
+    file_backup_exists=$( ls -A ~/ | grep '.local_notes_backup' );
+
+    if [[ -n $file_backup_exists ]];
+    then
+        printf "Backup already exists.\n";
+        exit;
+    else
+        cp $filename $filename_backup;
+    fi
+}
+
+restore_notes()
+{
+    file_backup_exists=$( ls -A ~/ | grep '.local_notes_backup' );
+
+    if [[ -z $file_backup_exists ]];
+    then
+        printf "No backup file.\n";
+        exit;
+    else
+        cp $filename_backup $filename;
+    fi
+}
+
 usage()
 {
 printf "Usage: notebook [OPTION] [VALUE]
@@ -199,6 +225,16 @@ case $1 in
         check_options_overflow;
         remove_line;
         ;;
+    '-b' | '--backup')
+        par=$2;
+        check_options_overflow;
+        make_backup;
+        ;;
+    '-rs' | '--restore')
+        par=$2;
+        check_options_overflow;
+        restore_notes;
+        ;;
     '-c' | '--clear')
         par=$2;
         check_options_overflow;
@@ -217,3 +253,4 @@ case $1 in
         ;;
 
 esac
+
