@@ -165,8 +165,7 @@ make_backup()
     if [[ -n $file_backup_exists ]];
     then
         printf "Backup already exists.\n";
-        read -p "Do you want to rewrite the backup? [Y/N] " -n 1 -r;
-        printf "\n";
+        read -p "Do you want to rewrite the backup? [Y/n] " -r;
         if [[ $REPLY =~ ^[Yy]$ ]]
         then
             cp $filename $filename_backup;
