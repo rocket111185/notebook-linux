@@ -1,0 +1,6 @@
+#!/bin/bash
+
+chmod +x ./prepare_package;
+./prepare_package;
+sudo dpkg -i ./notebook.deb;
+rm ./notebook.deb;
