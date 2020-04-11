@@ -29,6 +29,7 @@ fi
 note=;
 par=;
 to_remove=;
+remove_till=;
 color="\e[0m";
 line_count=$( wc -l $filename | awk '{ print $1 }' );
 
@@ -105,9 +106,25 @@ remove_line()
         i=$[ $i + 1 ];
     done
 
+    if [[ -n $remove_till ]];
+    then
+        if [ $remove_till -gt $line_count ];
+        then
+            printf "You've tried to remove lines, that doesn't exist.\n";
+            exit 1;
+        else
+            i=$remove_till;
+        fi
+    fi
+
     while [ $i -ne $line_count ];
     do
-        index=$i;
+        if [[ -n $remove_till ]];
+        then
+            index=$[ $i - $remove_till + $to_remove ];
+        else
+            index=$i;
+        fi
         i=$[ $i + 1 ];
         line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
         printf "$index.$line\n" >> $filename_temp;
@@ -197,9 +214,11 @@ Take notes inside the terminal.\n
     -a, --add\t\tAdd note VALUE.
     -p, --paint\t\tSet color VALUE.
                \t\tUse only after -a, for instance:\n
-    notebook -a 'foo' -p 'green'\n
+    $ notebook -a 'foo' -p 'green'\n
     -c, --clear\t\tClear all the notes.
     -r, --remove\tRemove the line number VALUE.
+                \tAlso you can set the interval:\n
+    $ notebook -r VALUE1 VALUE2\n
     -b, --backup\tMake a backup.
     -rs, --restore\tRestore notes from backup.
     -h, --help\t\tShow the help.\n
@@ -229,6 +248,8 @@ case $1 in
     '-r' | '--remove')
         shift;
         to_remove=$1;
+	shift;
+	remove_till=$1;
         par=$2;
         check_options_overflow;
         remove_line;
