@@ -1,0 +1,13 @@
+#!/bin/bash
+
+initial_dir=$PWD;
+rpmdev-setuptree;
+cp notebook.spec ~/rpmbuild/SPECS/;
+mkdir -p ~/rpmbuild/SOURCES/notebook-1/;
+cp ../notebook ~/rpmbuild/SOURCES/notebook-1/;
+cd ~/rpmbuild/SOURCES;
+tar -czf notebook-1.tar.gz notebook-1;
+rpmbuild --bb ~/rpmbuild/SPECS/notebook.spec;
+sudo rpm -ivh ~/rpmbuild/RPMS/noarch/notebook-1-0.noarch.rpm;
+cd $initial_dir;
+rm -r ~/rpmbuild;

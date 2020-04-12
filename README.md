@@ -29,10 +29,17 @@ $ notebook
 ```
 
 ## Installation
-At this moment, the automated installation is possible only for Debian and its derivatives.
+The automated installation is possible for Debian and its derivatives, and also for Fedora.
 In order to install, launch these commands:
+### Debian
 ```bash
 $ cd Debian
+$ chmod +x install
+$ ./install
+```
+### Fedora
+```bash
+$ cd Fedora
 $ chmod +x install
 $ ./install
 ```
