@@ -17,15 +17,23 @@ $ notebook -a 'Some note, but colored' -p 'green'
 In order to delete the line, use -r:
 ```bash
 $ notebook
-1. Some note
-2. Some note2
-3. Some note3
-4. Some note4
+1. one
+2. two
+3. three
+4. four
+5. five
+6. six
 $ notebook -r 3
 $ notebook
-1. Some note
-2. Some note2
-3. Some note4
+1. one
+2. two
+3. four
+4. five
+5. six
+$ notebook -r 2 4
+$ notebook
+1. one
+2. six
 ```
 
 ## Installation
@@ -38,7 +46,7 @@ $ chmod +x install
 $ ./install
 ```
 ### Fedora
-The necessary package is `rpm-build`. If you have installed it, Launch these commands:
+The necessary package is `rpm-build`. If you have installed it, launch these commands:
 ```bash
 $ cd Fedora
 $ chmod +x install
