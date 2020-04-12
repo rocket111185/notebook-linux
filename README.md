@@ -30,14 +30,15 @@ $ notebook
 
 ## Installation
 The automated installation is possible for Debian and its derivatives, and also for Fedora.
-In order to install, launch these commands:
 ### Debian
+No addition package is required. Just launch these commands in the terminal:
 ```bash
 $ cd Debian
 $ chmod +x install
 $ ./install
 ```
 ### Fedora
+The necessary package is `rpm-build`. If you have installed it, Launch these commands:
 ```bash
 $ cd Fedora
 $ chmod +x install

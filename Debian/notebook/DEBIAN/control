@@ -1,5 +1,5 @@
 Package: notebook
-Version: 0.1
+Version: 1.0
 Architecture: all
 Maintainer: D_MENT <rocket111185@gmail.com>
 Depends: bash
