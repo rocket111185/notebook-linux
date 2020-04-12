@@ -10,7 +10,7 @@ Source0:        notebook-1.tar.gz
 BuildArch:      noarch
 
 %description
-Package installing latest version the admin scripts used by the IT dept.
+Simple script that allows to make notes inside terminal.
 
 %prep
 %setup -q
