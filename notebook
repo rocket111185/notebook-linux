@@ -9,19 +9,21 @@ filename=~/.local_notes;
 filename_temp=~/.local_notes_temp;
 filename_backup=~/.local_notes_backup;
 
-file_exists=$( ls -A ~/ | grep '.local_notes' )
+file_exists=$( ls -A ~/ | grep '.local_notes' );
 
 if [[ -z $file_exists ]];
 then
     touch $filename;
 fi
 
-file_temp_exists=$( ls -A ~/ | grep '.local_notes_temp' )
+file_temp_exists=$( ls -A ~/ | grep '.local_notes_temp' );
 
 if [[ -n $file_temp_exists ]];
 then
     rm $filename_temp;
 fi
+
+file_backup_exists=$( ls -A ~/ | grep '.local_notes_backup' );
 
 ##### Variables
 
@@ -185,8 +187,6 @@ check_options_overflow()
 
 make_backup()
 {
-    file_backup_exists=$( ls -A ~/ | grep '.local_notes_backup' );
-
     if [[ -n $file_backup_exists ]];
     then
         printf "Backup already exists.\n";
@@ -204,14 +204,114 @@ make_backup()
 
 restore_notes()
 {
-    file_backup_exists=$( ls -A ~/ | grep '.local_notes_backup' );
-
     if [[ -z $file_backup_exists ]];
     then
         printf "No backup file.\n";
         exit;
     else
         cp $filename_backup $filename;
+    fi
+}
+
+three_dots()
+{
+    sleep 1;
+    printf "."
+    sleep 1;
+    printf "."
+    sleep 1;
+    printf "."
+    sleep 1;
+    printf "\n"
+}
+
+print_ok()
+{
+    sleep 0.1;
+    printf "\e[1m[  \e[32mOK\e[0m\e[1m  ] ";
+}
+
+print_failed()
+{
+    sleep 0.1;
+    printf "\e[1m[\e[31mFAILED\e[0m\e[1m] ";
+}
+
+uninstall()
+{
+    read -p "Do you want to delete all the files? [Y/n] " -r;
+    if [[ $REPLY =~ ^[Yy]$ ]];
+    then
+        printf "Hm";
+        three_dots;
+        read -p "Are you sure? [Y/n] " -r;
+        if [[ $REPLY =~ ^[Yy]$ ]];
+        then
+            printf "Well";
+            three_dots;
+            read -p "Are you completely sure? [Y/n] " -r;
+            if [[ $REPLY =~ ^[Yy]$ ]];
+            then
+                printf "Preparing to uninstall";
+                three_dots;
+                sleep 1.5;
+                clear;
+                print_ok;
+                printf "Unexpectedly loaded daemon systemd.\n";
+                sleep 0.1;
+                printf "\t Lennart Poettering, WTF?\n";
+                print_ok;
+                printf "Sent 'WTF' to Lennart Poettering.\n";
+                print_ok;
+                printf "Started pretending doing something useful.\n";
+                sleep 0.1;
+                printf "\t Plugging microwave to USB4...\n";
+                print_failed;
+                printf "Failed to plug microwave.\n";
+                print_ok;
+                printf "Sent user's nudes to a random girl.\n";
+                sleep 1;
+                print_ok;
+                printf "Loaded Minecraft with shaders in order to heat the room.\n";
+                if [[ -n $file_exists ]];
+                then
+                    rm $filename;
+                fi
+                if [[ -n $file_backup_exists ]];
+                then
+                    rm $filename_backup;
+                fi
+                print_ok;
+                printf "Removed necessary files (at this point).\n";
+                print_ok;
+                printf "Made Lenin and Stalin alive.\n";
+                print_ok;
+                printf "Recreated USSR.\n";
+                print_ok;
+                printf "Changed file permissions to accessible for everyone.\n";
+                print_ok;
+                printf "Checked e-mail for the viruses.\n";
+                print_ok;
+                printf "Invented the vaccine against AID.\n";
+                print_ok;
+                printf "Installed Backbone.js framework.\n";
+                sleep 0.1;
+                printf "\t Trying to create good project using Backbone.js...\n";
+                print_failed;
+                printf "Failed to create good project.\n";
+                print_ok;
+                printf "Uninstalled Backbone.js framework.\n";
+                print_ok;
+                printf "Stopped to pretend doing useful actions.\n";
+                print_ok;
+                printf "Stopped to scare user with systemd-style messages.\n";
+                sleep 2;
+            fi
+        fi
+    else
+        printf "1. \e[32m\e[1mThe files have been corrupted. MW-HA-HA!\e[0m\n" > $filename;
+        printf "1. \e[32m\e[1mBackup file won't help you.\e[0m\n" > $filename_backup;
+        printf "OK\n";
     fi
 }
 
@@ -229,6 +329,8 @@ Take notes inside the terminal.\n
     $ notebook -r VALUE1 VALUE2\n
     -b, --backup\tMake a backup.
     -rs, --restore\tRestore notes from backup.
+    --uninstall\t\tDelete all files before the uninstall.
+               \t\tBe careful.
     -h, --help\t\tShow the help.\n
 With no parameters, notebook shows saved notes.\n";
 }
@@ -276,6 +378,11 @@ case $1 in
         par=$2;
         check_options_overflow;
         clear_notes;
+        ;;
+    '--uninstall')
+        par=$2;
+        check_options_overflow;
+        uninstall;
         ;;
     '-h' | '--help')
         par=$2;

@@ -35,6 +35,10 @@ $ notebook
 1. one
 2. six
 ```
+Also this script can:
+* Clear all the notes at once
+* Make backup and restore
+* Make you mad after discovering... Easter Egg)
 
 ## Installation
 The automated installation is possible for Debian and its derivatives, and also for Fedora.
