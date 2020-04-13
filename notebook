@@ -108,7 +108,11 @@ remove_line()
 
     if [[ -n $remove_till ]];
     then
-        if [ $remove_till -gt $line_count ];
+        if ! [[ $remove_till =~ $number_mask ]];
+        then
+            printf "Is \'$remove_till\' an integer?\n";
+            exit 1
+        elif [ $remove_till -gt $line_count ];
         then
             printf "You've tried to remove lines, that doesn't exist.\n";
             exit 1;
