@@ -3,5 +3,5 @@ Version: 1.0
 Architecture: all
 Maintainer: D_MENT <rocket111185@gmail.com>
 Depends: bash
-Installed-Size: 5
+Installed-Size: 12
 Description: Simple script that allows to make notes inside terminal.
