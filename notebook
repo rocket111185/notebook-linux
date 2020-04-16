@@ -1,13 +1,29 @@
 #!/bin/bash
 
 # notebook - A script to make notes inside terminal
+# Licensed under the MIT License
+# Copyright (c) 2020 Rekechynsky Dmytro aka DMENT
+
+# NOTE: notebook saves notes on the principle
+# "one note - one line", so consider the terms
+# "note" and "line" the same.
+
 
 
 ##### Initialization
 
+
+# Notes are saved in the file ~/.local_notes
+# Backup is located in the file ~/.local_notes_backup
+# ~/.local_notes_temp is temporary file, which is
+# used for performing operations of deleting lines.
+
 filename=~/.local_notes;
 filename_temp=~/.local_notes_temp;
 filename_backup=~/.local_notes_backup;
+
+# In order to avoid performing operations at non-existent
+# file it's good to create the file.
 
 file_exists=$( ls -A ~/ | grep '.local_notes' );
 
@@ -16,6 +32,10 @@ then
     touch $filename;
 fi
 
+# If temporary file exists, remove it.
+# Even it is deleted every time after performing some
+# operations, it helps to avoid corruptions.
+
 file_temp_exists=$( ls -A ~/ | grep '.local_notes_temp' );
 
 if [[ -n $file_temp_exists ]];
@@ -23,23 +43,24 @@ then
     rm $filename_temp;
 fi
 
+# This variable is needed only for backup operations.
+
 file_backup_exists=$( ls -A ~/ | grep '.local_notes_backup' );
 
-##### Variables
-
-
-note=;
-par=;
-to_remove=;
-remove_till=;
-color="\e[0m";
-line_count=$( wc -l $filename | awk '{ print $1 }' );
 
 
 ##### Colors
 
 
+# notebook has feature to paint notes with
+# different colors. This feature is provided
+# easily thanks to regular expressions (REGEXP).
+
+# It's not "white color" REGEXP, but "clear
+# all formats were set before"
+
 white="\e[0m";
+
 red="\e[31m";
 green="\e[32m";
 yellow="\e[33m";
@@ -48,8 +69,49 @@ magenta="\e[35m";
 cyan="\e[36m";
 
 
+
+##### Variables
+
+
+# This variable holds text of note, which
+# is going to be added.
+
+note=;
+
+# This variable is used for checking for
+# odd arguments.
+
+odd_par=;
+
+# For correct number checking.
+
+to_check=;
+
+# Number of note to remove.
+
+to_remove=;
+
+# If you want to remove couple of lines at once,
+# this variable holds last number of note to remove.
+
+remove_till=;
+
+# Holds color value. The default is white.
+
+color=$white;
+
+# The count of all the notes.
+
+line_count=$( wc -l $filename | awk '{ print $1 }' );
+
+
+
 ##### Functions
 
+
+# write_notes() adds a note to file in the format:
+# LINE_NUMBER. REGEXP_SET_COLOR NOTE REGEXP_CLEAR_FORMAT
+# But you can't add empty note.
 
 write_notes()
 {
@@ -63,86 +125,10 @@ write_notes()
     fi
 }
 
-show_notes()
-{
-    if [[ $line_count == "0" ]];
-    then
-        printf "There are no notes.\n"
-    else
-        cat $filename;
-    fi
-}
-
-clear_notes()
-{
-    printf '' > $filename;
-}
-
-
-remove_line()
-{
-    number_mask='^[0-9]+$';
-
-    if ! [[ $to_remove =~ $number_mask ]];
-    then
-        printf "Is \'$to_remove\' an integer?\n";
-        exit 1;
-    elif [ $to_remove -lt 1 ];
-    then
-        printf "The line number must be greater then zero.\n";
-        exit 1;
-    elif [ $to_remove -gt $line_count ];
-    then
-        printf "You've tried to remove line, that doesn't exist.\n";
-        exit 1;
-    fi
-
-    touch $filename_temp;
-
-    i=1;
-
-    while [ $i -lt $to_remove ];
-    do
-        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
-        printf "$i.$line\n" >> $filename_temp;
-        i=$[ $i + 1 ];
-    done
-
-    if [[ -n $remove_till ]];
-    then
-        if ! [[ $remove_till =~ $number_mask ]];
-        then
-            printf "Is \'$remove_till\' an integer?\n";
-            exit 1
-        elif [ $remove_till -gt $line_count ];
-        then
-            printf "You've tried to remove lines, that doesn't exist.\n";
-            exit 1;
-        elif [ $remove_till -lt $to_remove ];
-        then
-            printf "The first argument must be smaller than the second argument.\n";
-            exit 1;
-        else
-            i=$remove_till;
-        fi
-    fi
-
-    while [ $i -ne $line_count ];
-    do
-        if [[ -n $remove_till ]];
-        then
-            index=$[ $i - $remove_till + $to_remove ];
-        else
-            index=$i;
-        fi
-        i=$[ $i + 1 ];
-        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
-        printf "$index.$line\n" >> $filename_temp;
-    done
-
-    rm $filename;
-    mv $filename_temp $filename;
-}
+# choose_color() converts the verbal expression of
+# color into REGEXP.
+# If you set color, which is not in the list, an error
+# message appears.
 
 choose_color()
 {
@@ -176,14 +162,128 @@ choose_color()
 esac
 }
 
+# show_notes() shows all the notes, saved to ~/.local_notes
+# If ~/.local_notes is empty, the appropriate message appears.
+
+show_notes()
+{
+    if [[ $line_count == "0" ]];
+    then
+        printf "There are no notes.\n"
+    else
+        cat $filename;
+    fi
+}
+
+# clear_notes() clears the file ~/.local_notes
+# by rewriting text into empty string.
+
+clear_notes()
+{
+    printf '' > $filename;
+}
+
+
+# correct_number_checking() is the helping
+# function for remove_line()
+# It checks the arguments for:
+# - being the integer, actually;
+# - being positive number;
+# - being the existent note number (not greater, than
+#   count of lines in the file)
+
+correct_number_checking()
+{
+    number_mask='^[0-9]+$';
+    if ! [[ $to_check =~ $number_mask ]];
+    then
+        printf "Is \'$to_check\' an integer?\n";
+        exit 1;
+    elif [ $to_check -lt 1 ];
+    then
+        printf "The line number must be greater then zero.\n";
+        exit 1;
+    elif [ $to_check -gt $line_count ];
+    then
+        printf "You've tried to remove line (or lines), that doesn't exist.\n";
+        exit 1;
+    fi
+}
+
+# remove_line() removes the line (or lines) from the file in
+# a such way:
+# 1) Check $to_remove to be correct argument
+# 2) Create temporary file
+# 3) Coprying the lines from original to temporary file
+#    through iteration (from the first to the line before line
+#    that must be removed).
+# 4) Continue copying lines from the new point.
+#    The new point is:
+#    - line after $remove_till
+#    - or, if $remove_till is empty, line after $to_remove
+# 5) Delete original file, rename temporary file as the original.
+
+remove_line()
+{
+    to_check=$to_remove;
+    correct_number_checking;
+
+    touch $filename_temp;
+
+    i=1;
+
+    while [ $i -lt $to_remove ];
+    do
+        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
+        printf "$i.$line\n" >> $filename_temp;
+        i=$[ $i + 1 ];
+    done
+
+    if [[ -n $remove_till ]];
+    then
+        to_check=$remove_till;
+        correct_number_checking;
+        if [ $remove_till -lt $to_remove ];
+        then
+            printf "The first argument must be smaller than the second argument.\n";
+            exit 1;
+        fi
+            i=$remove_till;
+    fi
+
+    while [ $i -ne $line_count ];
+    do
+        if [[ -n $remove_till ]];
+        then
+            index=$[ $i - $remove_till + $to_remove ];
+        else
+            index=$i;
+        fi
+        i=$[ $i + 1 ];
+        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
+        printf "$index.$line\n" >> $filename_temp;
+    done
+
+    rm $filename;
+    mv $filename_temp $filename;
+}
+
+# check_options_overflow() ensures that no odd arguments
+# are entered.
+
 check_options_overflow()
 {
-    if [[ -n $par ]];
+    if [[ -n $odd_par ]];
     then
         printf "Too much arguments!\n";
         exit 1;
     fi
 }
+
+# make_backup() creates a copy of original file and
+# locates it in ~/.local_notes_backup.
+# If ~/.local_notes_backup already exists, the prompt
+# requests a user to confirm rewriting existing backup.
 
 make_backup()
 {
@@ -202,6 +302,11 @@ make_backup()
     fi
 }
 
+# restore_notes() rewrites original file with copy
+# of backup file.
+# But the function does it only in the case of existing
+# backup file.
+
 restore_notes()
 {
     if [[ -z $file_backup_exists ]];
@@ -213,17 +318,42 @@ restore_notes()
     fi
 }
 
+# remove_files() is the helping function for
+# uninstall() function.
+# remove_files() removes the original and backup files.
+
+remove_files()
+{
+    if [[ -n $file_exists ]];
+    then
+        rm $filename;
+    fi
+
+    if [[ -n $file_backup_exists ]];
+    then
+        rm $filename_backup;
+    fi
+}
+
+# three_dots() is the helping function for
+# uninstall() function.
+# Just an animation for "thinking" effect.
+
 three_dots()
 {
-    sleep 1;
-    printf "."
-    sleep 1;
-    printf "."
-    sleep 1;
-    printf "."
+    for (( i=0; i < 3; i++ ));
+    do
+        sleep 1;
+        printf ".";
+    done;
     sleep 1;
     printf "\n"
 }
+
+# print_ok() is the helping function for
+# uninstall() function.
+# Prints out "OK" status systemd-style
+# string.
 
 print_ok()
 {
@@ -231,11 +361,24 @@ print_ok()
     printf "\e[1m[  \e[32mOK\e[0m\e[1m  ] ";
 }
 
+# print_failed() is the helping function for
+# uninstall() function
+# Prints out "FAILED" status systemd-style
+# string.
+
 print_failed()
 {
     sleep 0.1;
     printf "\e[1m[\e[31mFAILED\e[0m\e[1m] ";
 }
+
+# uninstall() deletes all the files.
+# It helps to prepare before the uninstallation of
+# notebook package.
+#
+# NOTE: in order to have fun, but not loose the notes,
+# copy ~/.local_notes and ~/.local_notes_backup into
+# some other place.
 
 uninstall()
 {
@@ -273,14 +416,7 @@ uninstall()
                 sleep 1;
                 print_ok;
                 printf "Loaded Minecraft with shaders in order to heat the room.\n";
-                if [[ -n $file_exists ]];
-                then
-                    rm $filename;
-                fi
-                if [[ -n $file_backup_exists ]];
-                then
-                    rm $filename_backup;
-                fi
+                remove_files;
                 print_ok;
                 printf "Removed necessary files (at this point).\n";
                 print_ok;
@@ -315,6 +451,8 @@ uninstall()
     fi
 }
 
+# usage() is the --help section.
+
 usage()
 {
 printf "Usage: notebook [OPTION] [VALUE]
@@ -339,6 +477,9 @@ With no parameters, notebook shows saved notes.\n";
 ##### Main
 
 
+# I think, Main section is understandable and
+# doesn't need any explainations.
+
 case $1 in
 
     '-a' | '--add')
@@ -351,7 +492,7 @@ case $1 in
             color=$1;
             choose_color;
         fi
-        par=$2;
+        odd_par=$2;
         check_options_overflow;
         write_notes;
         ;;
@@ -360,32 +501,32 @@ case $1 in
         to_remove=$1;
         shift;
         remove_till=$1;
-        par=$2;
+        odd_par=$2;
         check_options_overflow;
         remove_line;
         ;;
     '-b' | '--backup')
-        par=$2;
+        odd_par=$2;
         check_options_overflow;
         make_backup;
         ;;
     '-rs' | '--restore')
-        par=$2;
+        odd_par=$2;
         check_options_overflow;
         restore_notes;
         ;;
     '-c' | '--clear')
-        par=$2;
+        odd_par=$2;
         check_options_overflow;
         clear_notes;
         ;;
     '--uninstall')
-        par=$2;
+        odd_par=$2;
         check_options_overflow;
         uninstall;
         ;;
     '-h' | '--help')
-        par=$2;
+        odd_par=$2;
         check_options_overflow;
         usage;
         ;;
@@ -397,4 +538,8 @@ case $1 in
         ;;
 
 esac
+
+
+
+#END?
 
