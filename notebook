@@ -296,7 +296,6 @@ make_backup()
             cp $filename $filename_backup;
             printf "Success.\n"
         fi
-        exit;
     else
         cp $filename $filename_backup;
     fi
@@ -312,7 +311,6 @@ restore_notes()
     if [[ -z $file_backup_exists ]];
     then
         printf "No backup file.\n";
-        exit;
     else
         cp $filename_backup $filename;
     fi
@@ -541,5 +539,5 @@ esac
 
 
 
-#END?
+##### End?
 
