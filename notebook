@@ -61,6 +61,7 @@ file_backup_exists=$( ls -A ~/ | grep '.local_notes_backup' );
 
 white="\e[0m";
 
+bold="\e[1m";
 red="\e[31m";
 green="\e[32m";
 yellow="\e[33m";
@@ -135,7 +136,7 @@ choose_color()
     case $color in
 
         'white')
-            color=$white;
+            color=$bold;
         ;;
         'red')
             color=$red;
@@ -312,7 +313,12 @@ restore_notes()
     then
         printf "No backup file.\n";
     else
-        cp $filename_backup $filename;
+        read -p "Do you want to rewrite the notes from backup? [Y/n] " -r;
+        if [[ $REPLY =~ ^[Yy]$ ]]
+        then
+            cp $filename_backup $filename;
+            printf "Success.\n"
+        fi
     fi
 }
 
@@ -356,7 +362,8 @@ three_dots()
 print_ok()
 {
     sleep 0.1;
-    printf "\e[1m[  \e[32mOK\e[0m\e[1m  ] ";
+    o="OK";
+    printf "$bold[  $green$o$white$bold  ] ";
 }
 
 # print_failed() is the helping function for
@@ -367,7 +374,8 @@ print_ok()
 print_failed()
 {
     sleep 0.1;
-    printf "\e[1m[\e[31mFAILED\e[0m\e[1m] ";
+    f="FAILED";
+    printf "$bold[$red$f$white$bold] ";
 }
 
 # uninstall() deletes all the files.
@@ -422,11 +430,11 @@ uninstall()
                 print_ok;
                 printf "Recreated USSR.\n";
                 print_ok;
-                printf "Changed file permissions to accessible for everyone.\n";
+                printf "Changed file permissions to accessible for everyone except capitalists.\n";
                 print_ok;
                 printf "Checked e-mail for the viruses.\n";
                 print_ok;
-                printf "Invented the vaccine against AID.\n";
+                printf "Invented the vaccine against AIDS.\n";
                 print_ok;
                 printf "Installed Backbone.js framework.\n";
                 sleep 0.1;
@@ -436,6 +444,10 @@ uninstall()
                 print_ok;
                 printf "Uninstalled Backbone.js framework.\n";
                 print_ok;
+                printf "Congratulated user's grandmother on 'Still alive today.'\n";
+                print_ok;
+                printf "Promised user's mother to visit her again.\n";
+                print_ok;
                 printf "Stopped to pretend doing useful actions.\n";
                 print_ok;
                 printf "Stopped to scare user with systemd-style messages.\n";
@@ -443,8 +455,10 @@ uninstall()
             fi
         fi
     else
-        printf "1. \e[32m\e[1mThe files have been corrupted. MW-HA-HA!\e[0m\n" > $filename;
-        printf "1. \e[32m\e[1mBackup file won't help you.\e[0m\n" > $filename_backup;
+        phrase1="The files have been corrupted. MW-HA-HA!";
+        phrase2="Backup file won't help you.";
+        printf "1. $green$bold$phrase1$white\n" > $filename;
+        printf "1. $green$bold$phrase2$white\n" > $filename_backup;
         printf "OK\n";
     fi
 }
@@ -453,12 +467,12 @@ uninstall()
 
 usage()
 {
-printf "Usage: notebook [OPTION] [VALUE]
+printf 'Usage: notebook [OPTION] [VALUE]
 Take notes inside the terminal.\n
     -a, --add\t\tAdd note VALUE.
     -p, --paint\t\tSet color VALUE.
                \t\tUse only after -a, for instance:\n
-    $ notebook -a 'foo' -p 'green'\n
+    $ notebook -a "foo" -p "green"\n
     -c, --clear\t\tClear all the notes.
     -r, --remove\tRemove the line number VALUE.
                 \tAlso you can set the interval:\n
@@ -468,7 +482,7 @@ Take notes inside the terminal.\n
     --uninstall\t\tDelete all files before the uninstall.
                \t\tBe careful.
     -h, --help\t\tShow the help.\n
-With no parameters, notebook shows saved notes.\n";
+With no parameters, notebook shows saved notes.\n';
 }
 
 
@@ -540,4 +554,3 @@ esac
 
 
 ##### End?
-
