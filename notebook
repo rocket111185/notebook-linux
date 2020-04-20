@@ -105,6 +105,10 @@ color=$white;
 
 line_count=$( wc -l $filename | awk '{ print $1 }' );
 
+# Detected terminal
+
+terminal=;
+
 
 
 ##### Functions
@@ -463,6 +467,102 @@ uninstall()
     fi
 }
 
+# Autodetection of the terminal emulator.
+# NOTE: it's difficult to provide initial command loading
+# for terminal emulators, such as:
+# Guake.
+
+choose_terminal()
+{
+    terms=(lxterminal gnome-terminal xterm terminator rxvt Eterm termit xfce4-terminal tilda);
+    for t in ${terms[*]}
+    do
+        if [ $(command -v $t) ]
+        then
+            terminal=$t
+            break
+        fi
+    done
+}
+
+# schedule() schedules notebook loading, provided by at utility.
+# Works in this way:
+# - chooses one terminal of available to print out notes contents;
+# - creates script to load terminal with initial commands.
+# NOTE: at uses /bin/sh to load script.
+# - prompt to read time to schedule;
+# - schedule loading using at.
+
+schedule()
+{
+    if [[ -z $terminal ]];
+    then
+        choose_terminal;
+    fi
+
+    launcher=;
+
+    case $terminal in
+
+        'gnome-terminal')
+            launcher='gnome-terminal -- bash -c "notebook; sleep 1000000"';
+            ;;
+        'lxterminal')
+            launcher='lxterminal --command "notebook; sleep 1000000"';
+            ;;
+        'xterm')
+            launcher='xterm -e "notebook; sleep 1000000"';
+            ;;
+        'terminator')
+            launcher='terminator -e "notebook; sleep 10000"';
+            ;;
+        'rxvt')
+            launcher='rxvt -e bash -c "notebook; sleep 1000000"';
+            ;;
+        'Eterm')
+            launcher='Eterm -e bash -c "notebook; sleep 1000000"';
+            ;;
+        'termit')
+            launcher='termit -e bash -c "notebook; sleep 1000000"';
+            ;;
+        'xfce4-terminal')
+            launcher='xfce4-terminal -e \"bash -c \\\"notebook; sleep 1000000\\\"\"';
+            ;;
+        'tilda')
+            launcher='tilda -c \"bash -c \\\"notebook; sleep 1000000\\\"\"';
+            ;;
+        '')
+            printf "No terminal is detected.\n"
+            exit 1;
+            ;;
+        *)
+            printf "For $terminal scheduling feature isn't provided yet.";
+            exit 1;
+            ;;
+
+    esac
+
+    sch_number=$( ls ~ | grep 'scheduled_commands' | wc -l );
+    sch_name="scheduled_commands$sch_number.sh";
+
+    while [[ -n $( ls ~ | grep $sch_name ) ]];
+    do
+        sch_number=$[ $sch_number + 1 ];
+        sch_name="scheduled_commands$sch_number.sh";
+    done
+
+    touch ~/$sch_name;
+    printf "#!/bin/sh
+export DISPLAY=$DISPLAY;
+$launcher;
+rm ~/$sch_name\n" > ~/$sch_name;
+    chmod +x ~/$sch_name;
+
+    printf "Print time to schedule using$green$bold at$white utility format\n> ";
+    read;
+    at $REPLY -f ~/$sch_name;
+}
+
 # usage() is the --help section.
 
 usage()
@@ -479,6 +579,9 @@ Take notes inside the terminal.\n
     $ notebook -r VALUE1 VALUE2\n
     -b, --backup\tMake a backup.
     -rs, --restore\tRestore notes from backup.
+    -sch, --schedule\tSchedule loading notebook for later,
+                    \tusing at utility format.
+                    \tVALUE is your prefered terminal.
     --uninstall\t\tDelete all files before the uninstall.
                \t\tBe careful.
     -h, --help\t\tShow the help.\n
@@ -541,6 +644,13 @@ case $1 in
         odd_par=$2;
         check_options_overflow;
         usage;
+        ;;
+    '-sch' | '--schedule')
+        shift;
+        terminal=$1;
+        odd_par=$2;
+        check_options_overflow;
+        schedule;
         ;;
     '')
         show_notes;

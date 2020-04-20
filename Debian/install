@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if ! [ $(command -v at) ];
+then
+    sudo apt-get install at;
+fi
+
 chmod +x ./prepare_package;
 ./prepare_package;
 sudo dpkg -i ./notebook.deb;

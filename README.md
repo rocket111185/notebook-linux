@@ -38,10 +38,13 @@ $ notebook
 Also this script can:
 * Clear all the notes at once
 * Make backup and restore
+* Schedule loading for later, using `at` utility format
 * Make you mad after discovering... Easter Egg)
 
 ## Installation
 The automated installation is possible for Debian and its derivatives, and also for Fedora.
+
+`notebook` depends on `at`, which is resolved in every `install` script.
 ### Debian
 No addition package is required. Just launch these commands in the terminal:
 ```bash
