@@ -485,7 +485,13 @@ choose_terminal()
     done
 }
 
-#
+# schedule() schedules notebook loading, provided by at utility.
+# Works in this way:
+# - chooses one terminal of available to print out notes contents;
+# - creates script to load terminal with initial commands.
+# NOTE: at uses /bin/sh to load script.
+# - prompt to read time to schedule;
+# - schedule loading using at.
 
 schedule()
 {
@@ -525,10 +531,14 @@ schedule()
         'tilda')
             launcher='tilda -c \"bash -c \\\"notebook; sleep 1000000\\\"\"';
             ;;
-         *)
+        '')
             printf "No terminal is detected.\n"
             exit 1;
-         ;;
+            ;;
+        *)
+            printf "For $terminal scheduling feature isn't provided yet.";
+            exit 1;
+            ;;
 
     esac
 
@@ -547,6 +557,7 @@ export DISPLAY=$DISPLAY;
 $launcher;
 rm ~/$sch_name\n" > ~/$sch_name;
     chmod +x ~/$sch_name;
+
     printf "Print time to schedule using$green$bold at$white utility format\n> ";
     read;
     at $REPLY -f ~/$sch_name;
