@@ -536,7 +536,7 @@ schedule()
             exit 1;
             ;;
         *)
-            printf "For $terminal scheduling feature isn't provided yet.";
+            printf "For $terminal scheduling feature isn't provided yet.\n";
             exit 1;
             ;;
 
