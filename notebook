@@ -505,7 +505,7 @@ schedule()
     case $terminal in
 
         'gnome-terminal')
-            launcher='gnome-terminal -- notebook';
+            launcher='gnome-terminal -- bash -c "notebook; sleep 1000000"';
             ;;
         'lxterminal')
             launcher='lxterminal --command "notebook; sleep 1000000"';
