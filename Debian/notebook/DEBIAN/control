@@ -2,6 +2,6 @@ Package: notebook
 Version: 1.0
 Architecture: all
 Maintainer: D_MENT <rocket111185@gmail.com>
-Depends: bash
+Depends: bash, at
 Installed-Size: 12
 Description: Simple script that allows to make notes inside terminal.

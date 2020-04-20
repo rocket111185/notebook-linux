@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if ! [ $(command -v at) ];
+then
+    sudo dnf install at;
+fi
+
 initial_dir=$PWD;
 rpmdev-setuptree;
 cp notebook.spec ~/rpmbuild/SPECS/;
