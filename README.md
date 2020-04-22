@@ -35,6 +35,20 @@ $ notebook
 1. one
 2. six
 ```
+To edit the line, use -e:
+```bash
+$ notebook
+1. Some note
+2. Some note 2
+3. Test note
+4. Some note 4
+$ notebook -e 3 'New note'
+$ notebook
+1. Some note
+2. Some note 2
+3. New note
+4. Some note 4
+```
 Also this script can:
 * Clear all the notes at once
 * Make backup and restore
