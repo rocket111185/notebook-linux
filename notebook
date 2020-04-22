@@ -256,7 +256,7 @@ remove_line()
     do
         if [[ -n $remove_till ]];
         then
-            index=$(( i- remove_till + to_remove ));
+            index=$(( i - remove_till + to_remove ));
         else
             index=$i;
         fi
