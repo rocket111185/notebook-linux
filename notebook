@@ -25,9 +25,7 @@ filename_backup=~/.local_notes_backup;
 # In order to avoid performing operations at non-existent
 # file it's good to create the file.
 
-file_exists=$( ls -A ~/ | grep '.local_notes' );
-
-if [[ -z $file_exists ]];
+if ! [[ -f $filename ]];
 then
     touch $filename;
 fi
@@ -36,16 +34,10 @@ fi
 # Even it is deleted every time after performing some
 # operations, it helps to avoid corruptions.
 
-file_temp_exists=$( ls -A ~/ | grep '.local_notes_temp' );
-
-if [[ -n $file_temp_exists ]];
+if [[ -f $filename_temp ]];
 then
     rm $filename_temp;
 fi
-
-# This variable is needed only for backup operations.
-
-file_backup_exists=$( ls -A ~/ | grep '.local_notes_backup' );
 
 
 
@@ -212,7 +204,7 @@ correct_number_checking()
     then
         printf "The line number must be greater then zero.\n";
         exit 1;
-    elif [ $to_check -gt $line_count ];
+    elif [ $to_check -gt "$line_count" ];
     then
         printf "This line doesn't exist.\n";
         exit 1;
@@ -243,9 +235,9 @@ remove_line()
 
     while [ $i -lt $to_remove ];
     do
-        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
+        line=$( head -$i $filename | tail -n1 | cut -d'.' -f2- );
         printf "$i.$line\n" >> $filename_temp;
-        i=$[ $i + 1 ];
+        i=$(( i + 1 ));
     done
 
     if [[ -n $remove_till ]];
@@ -260,16 +252,16 @@ remove_line()
             i=$remove_till;
     fi
 
-    while [ $i -ne $line_count ];
+    while [ $i -ne "$line_count" ];
     do
         if [[ -n $remove_till ]];
         then
-            index=$[ $i - $remove_till + $to_remove ];
+            index=$(( i- remove_till + to_remove ));
         else
             index=$i;
         fi
-        i=$[ $i + 1 ];
-        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
+        i=$(( i + 1 ));
+        line=$( head -$i $filename | tail -n1 | cut -d'.' -f2- );
         printf "$index.$line\n" >> $filename_temp;
     done
 
@@ -297,21 +289,21 @@ edit()
 
     while [ $i -lt $to_edit ];
     do
-        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
+        line=$( head -$i $filename | tail -n1 | cut -d'.' -f2- );
         printf "$i.$line\n" >> $filename_temp;
-        i=$[ $i + 1 ];
+        i=$(( i + 1 ));
     done
 
-    color=$( cat $filename | head -$to_edit | tail -n1 | cut -d'.' -f2 | cut -d'm' -f1 );
+    color=$( head -$to_edit $filename | tail -n1 | cut -d'.' -f2 | cut -d'm' -f1 );
     m='m';
     edited_note="$to_edit.$color$m$note$white\n";
 
     printf "$edited_note" >> $filename_temp;
 
-    while [ $i -ne $line_count ];
+    while [ $i -ne "$line_count" ];
     do
-        i=$[ $i + 1 ];
-        line=$( cat $filename | head -$i | tail -n1 | cut -d'.' -f2- );
+        i=$(( i + 1 ));
+        line=$( head -$i $filename | tail -n1 | cut -d'.' -f2- );
         printf "$i.$line\n" >> $filename_temp;
     done
 
@@ -338,7 +330,7 @@ check_options_overflow()
 
 make_backup()
 {
-    if [[ -n $file_backup_exists ]];
+    if [[ -f $filename_backup ]];
     then
         printf "Backup already exists.\n";
         read -p "Do you want to rewrite the backup? [Y/n] " -r;
@@ -359,7 +351,7 @@ make_backup()
 
 restore_notes()
 {
-    if [[ -z $file_backup_exists ]];
+    if ! [[ -f $filename_backup ]];
     then
         printf "No backup file.\n";
     else
@@ -378,12 +370,12 @@ restore_notes()
 
 remove_files()
 {
-    if [[ -n $file_exists ]];
+    if [[ -f $filename ]];
     then
         rm $filename;
     fi
 
-    if [[ -n $file_backup_exists ]];
+    if [[ -f $filename_backup ]];
     then
         rm $filename_backup;
     fi
@@ -520,13 +512,13 @@ uninstall()
 
 choose_terminal()
 {
-    terms=(lxterminal gnome-terminal xterm terminator rxvt Eterm termit xfce4-terminal tilda);
-    for t in ${terms[*]}
+    terms=(gnome-terminal lxterminal xterm terminator rxvt Eterm termit xfce4-terminal tilda);
+    for t in ${terms[*]};
     do
-        if [ $(command -v $t) ]
+        if [ "$(command -v "$t")" ];
         then
-            terminal=$t
-            break
+            terminal=$t;
+            break;
         fi
     done
 }
@@ -556,20 +548,11 @@ schedule()
         'lxterminal')
             launcher='lxterminal --command "notebook; sleep 1000000"';
             ;;
-        'xterm')
-            launcher='xterm -e "notebook; sleep 1000000"';
+        'xterm' | 'terminator')
+            launcher="$terminal -e 'notebook; sleep 1000000'";
             ;;
-        'terminator')
-            launcher='terminator -e "notebook; sleep 10000"';
-            ;;
-        'rxvt')
-            launcher='rxvt -e bash -c "notebook; sleep 1000000"';
-            ;;
-        'Eterm')
-            launcher='Eterm -e bash -c "notebook; sleep 1000000"';
-            ;;
-        'termit')
-            launcher='termit -e bash -c "notebook; sleep 1000000"';
+        'rxvt' | 'Eterm' | 'termit')
+            launcher="$terminal -e bash -c 'notebook; sleep 1000000'";
             ;;
         'xfce4-terminal')
             launcher='xfce4-terminal -e \"bash -c \\\"notebook; sleep 1000000\\\"\"';
@@ -588,12 +571,12 @@ schedule()
 
     esac
 
-    sch_number=$( ls ~ | grep 'scheduled_commands' | wc -l );
+    sch_number=$( find ~/ -maxdepth 1 -name "sch*" | wc -l );
     sch_name="scheduled_commands$sch_number.sh";
 
-    while [[ -n $( ls ~ | grep $sch_name ) ]];
+    while [[ -n $( find ~/ -maxdepth 1 -name "$sch_name" ) ]];
     do
-        sch_number=$[ $sch_number + 1 ];
+        sch_number=$(( sch_number + 1 ));
         sch_name="scheduled_commands$sch_number.sh";
     done
 
@@ -605,8 +588,8 @@ rm ~/$sch_name\n" > ~/$sch_name;
     chmod +x ~/$sch_name;
 
     printf "Print time to schedule using$green$bold at$white utility format\n> ";
-    read;
-    at $REPLY -f ~/$sch_name;
+    read -r;
+    at "$REPLY" -f ~/$sch_name;
 }
 
 # usage() is the --help section.
