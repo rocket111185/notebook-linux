@@ -18,12 +18,17 @@
 # ~/.local_notes_temp is temporary file, which is
 # used for performing operations of deleting lines.
 
-filename=~/.local_notes;
-filename_temp=~/.local_notes_temp;
-filename_backup=~/.local_notes_backup;
+filename=~/.notebook_files/local_notes;
+filename_temp=~/.notebook_files/local_notes_temp;
+filename_backup=~/.notebook_files/local_notes_backup;
 
 # In order to avoid performing operations at non-existent
-# file it's good to create the file.
+# files it's good to create the files.
+
+if ! [[ -d ~/.notebook_files ]];
+then
+    mkdir ~/.notebook_files;
+fi
 
 if ! [[ -f $filename ]];
 then
@@ -571,10 +576,10 @@ schedule()
 
     esac
 
-    sch_number=$( find ~/ -maxdepth 1 -name "sch*" | wc -l );
+    sch_number=$( find ~/.notebook_files -maxdepth 1 -name "sch*" | wc -l );
     sch_name="scheduled_commands$sch_number.sh";
 
-    while [[ -n $( find ~/ -maxdepth 1 -name "$sch_name" ) ]];
+    while [[ -n $( find ~/.notebook_files -maxdepth 1 -name "$sch_name" ) ]];
     do
         sch_number=$(( sch_number + 1 ));
         sch_name="scheduled_commands$sch_number.sh";
@@ -584,12 +589,12 @@ schedule()
     printf "#!/bin/sh
 export DISPLAY=$DISPLAY;
 $launcher;
-rm ~/$sch_name\n" > ~/$sch_name;
-    chmod +x ~/$sch_name;
+rm ~/.notebook_files/$sch_name\n" > ~/.notebook_files/$sch_name;
+    chmod +x ~/.notebook_files/$sch_name;
 
     printf "Print time to schedule using$green$bold at$white utility format\n> ";
     read -r;
-    at "$REPLY" -f ~/$sch_name;
+    at "$REPLY" -f ~/.notebook_files/$sch_name;
 }
 
 # usage() is the --help section.

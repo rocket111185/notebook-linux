@@ -1,18 +1,50 @@
 #!/bin/bash
 
+# Install necessary dependencies
+
 if ! [ "$(command -v at)" ];
 then
     sudo dnf install at;
 fi
 
+if ! [ "$(command -v rpmdev-setuptree)" ];
+then
+    sudo dnf install rpmdevtools;
+fi
+
+# Save location of current directory
+
 initial_dir=$PWD;
+
+# If notebook is already installed, uninstall
+
+if [ "$(command -v notebook)" ];
+then
+    sudo rpm -e notebook;
+fi
+
+# Prepare files for packaging
+
 rpmdev-setuptree;
 cp notebook.spec ~/rpmbuild/SPECS/;
 mkdir -p ~/rpmbuild/SOURCES/notebook-1/;
-cp ../notebook ~/rpmbuild/SOURCES/notebook-1/;
+cp ../src/notebook ~/rpmbuild/SOURCES/notebook-1/;
 cd ~/rpmbuild/SOURCES || exit;
 tar -czf notebook-1.tar.gz notebook-1;
+
+# Build
+
 rpmbuild --bb ~/rpmbuild/SPECS/notebook.spec;
+
+# Install
+
 sudo rpm -ivh ~/rpmbuild/RPMS/noarch/notebook-1-0.noarch.rpm;
+
+# Return to the directory
+
 cd "$initial_dir" || exit;
+
+# Remove temporary files
+
 rm -r ~/rpmbuild;
+
