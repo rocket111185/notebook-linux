@@ -585,7 +585,7 @@ schedule()
         sch_name="scheduled_commands$sch_number.sh";
     done
 
-    touch ~/$sch_name;
+    touch ~/.notebook_files/$sch_name;
     printf "#!/bin/sh
 export DISPLAY=$DISPLAY;
 $launcher;
