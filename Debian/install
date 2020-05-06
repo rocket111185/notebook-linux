@@ -1,11 +1,22 @@
 #!/bin/bash
 
+# Resolve the at dependency
+
 if ! [ "$(command -v at)" ];
 then
     sudo apt-get install at;
 fi
 
+# Prepare the package
+
 chmod +x ./prepare_package;
 ./prepare_package;
+
+# Install
+
 sudo dpkg -i ./notebook.deb;
+
+# Remove temporary file
+
 rm ./notebook.deb;
+

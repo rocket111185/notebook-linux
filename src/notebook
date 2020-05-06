@@ -12,10 +12,12 @@
 
 ##### Initialization
 
-
-# Notes are saved in the file ~/.local_notes
-# Backup is located in the file ~/.local_notes_backup
-# ~/.local_notes_temp is temporary file, which is
+# Files are saved in the folder ~/.notebook_files
+# Now, '@' path is refered to '~./notebook_files'
+#
+# Notes are saved in the file @/local_notes
+# Backup is located in the file @/local_notes_backup
+# @/local_notes_temp is temporary file, which is
 # used for performing operations of deleting lines.
 
 filename=~/.notebook_files/local_notes;
@@ -168,8 +170,8 @@ choose_color()
 esac
 }
 
-# show_notes() shows all the notes, saved to ~/.local_notes
-# If ~/.local_notes is empty, the appropriate message appears.
+# show_notes() shows all the notes, saved to @/local_notes
+# If @/local_notes is empty, the appropriate message appears.
 
 show_notes()
 {
@@ -181,7 +183,7 @@ show_notes()
     fi
 }
 
-# clear_notes() clears the file ~/.local_notes
+# clear_notes() clears the file @/local_notes
 # by rewriting text into empty string.
 
 clear_notes()
@@ -329,8 +331,8 @@ check_options_overflow()
 }
 
 # make_backup() creates a copy of original file and
-# locates it in ~/.local_notes_backup.
-# If ~/.local_notes_backup already exists, the prompt
+# locates it in @/local_notes_backup.
+# If @/local_notes_backup already exists, the prompt
 # requests a user to confirm rewriting existing backup.
 
 make_backup()
@@ -535,6 +537,7 @@ choose_terminal()
 # NOTE: at uses /bin/sh to load script.
 # - prompt to read time to schedule;
 # - schedule loading using at.
+# In the case of fail (incorrect date), remove the script.
 
 schedule()
 {
@@ -594,7 +597,7 @@ rm ~/.notebook_files/$sch_name\n" > ~/.notebook_files/$sch_name;
 
     printf "Print time to schedule using$green$bold at$white utility format\n> ";
     read -r;
-    at "$REPLY" -f ~/.notebook_files/$sch_name;
+    at "$REPLY" -f ~/.notebook_files/$sch_name || rm ~/.notebook_files/$sch_name;
 }
 
 # usage() is the --help section.

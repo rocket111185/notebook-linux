@@ -1,7 +1,23 @@
 #!/bin/bash
 
+# Create the folders, which represent the path of
+# notebook script location
+
 mkdir -p ./notebook/usr/bin/;
+
+# Locate the script in the proper folder
+
 cp ../src/notebook ./notebook/usr/bin/;
+
+# Change file permissions for proper packaging
+
 chmod 0755 ./notebook/usr/bin/notebook;
+
+# Create the package
+
 dpkg -b ./notebook;
+
+# Remove temporary files
+
 rm -r ./notebook/usr/;
+
