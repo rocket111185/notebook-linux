@@ -73,3 +73,7 @@ $ cd Fedora
 $ chmod +x install
 $ ./install
 ```
+### Other Linux-based OS
+Just place the `notebook` script in the /usr/bin directory (or /usr/local/bin).
+
+In order to uninstall, delete it. Remember doing it under the root.

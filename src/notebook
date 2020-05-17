@@ -373,19 +373,11 @@ restore_notes()
 
 # remove_files() is the helping function for
 # uninstall() function.
-# remove_files() removes the original and backup files.
+# remove_files() removes all the files in the @ directory.
 
 remove_files()
 {
-    if [[ -f $filename ]];
-    then
-        rm $filename;
-    fi
-
-    if [[ -f $filename_backup ]];
-    then
-        rm $filename_backup;
-    fi
+    rm -r ~/.notebook_files
 }
 
 # three_dots() is the helping function for
@@ -541,7 +533,11 @@ choose_terminal()
 
 schedule()
 {
-    if [[ -z $terminal ]];
+    if ! [ $(command -v at) ];
+    then
+        printf "This feature requires$green$bold at$white utility.\n";
+        exit 1;
+    elif [[ -z $terminal ]];
     then
         choose_terminal;
     fi
