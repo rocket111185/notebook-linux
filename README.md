@@ -67,7 +67,10 @@ $ chmod +x install
 $ ./install
 ```
 ### Fedora
-The necessary package is `rpm-build`. If you have installed it, launch these commands:
+The necessary package is `rpmdevtools`. If you have not installed it, the script will install 
+it automatically.
+
+There are similar installation commands:
 ```bash
 $ cd Fedora
 $ chmod +x install
