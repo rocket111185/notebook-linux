@@ -58,15 +58,15 @@ fi
 # It's not "white color" REGEXP, but "clear
 # all formats were set before"
 
-white="\e[0m";
+white="\\e[0m";
 
-bold="\e[1m";
-red="\e[31m";
-green="\e[32m";
-yellow="\e[33m";
-blue="\e[34m";
-magenta="\e[35m";
-cyan="\e[36m";
+bold="\\e[1m";
+red="\\e[31m";
+green="\\e[32m";
+yellow="\\e[33m";
+blue="\\e[34m";
+magenta="\\e[35m";
+cyan="\\e[36m";
 
 
 
@@ -125,10 +125,10 @@ write_notes()
 {
     if [[ -n $note ]];
     then
-        number=$( printf "$line_count + 1\n" | bc );
-        printf "$number. $color$note$white\n" >> $filename;
+        number=$( printf "$line_count + 1\\n" | bc );
+        printf "$number. $color$note$white\\n" >> $filename;
     else
-        printf "You should add non-empty note\n";
+        printf "You should add non-empty note\\n";
         exit 1;
     fi
 }
@@ -164,7 +164,7 @@ choose_color()
             color=$cyan;
         ;;
         *)
-            printf "Possible colors: white, red, green, yellow, blue, magenta, cyan\n";
+            printf "Possible colors: white, red, green, yellow, blue, magenta, cyan\\n";
             exit 1;
         ;;
 esac
@@ -177,7 +177,7 @@ show_notes()
 {
     if [[ $line_count == "0" ]];
     then
-        printf "There are no notes.\n"
+        printf "There are no notes.\\n"
     else
         cat $filename;
     fi
@@ -205,15 +205,15 @@ correct_number_checking()
     number_mask='^[0-9]+$';
     if ! [[ $to_check =~ $number_mask ]];
     then
-        printf "Is \'$to_check\' an integer?\n";
+        printf "Is \\'$to_check\\' an integer?\\n";
         exit 1;
     elif [ $to_check -lt 1 ];
     then
-        printf "The line number must be greater then zero.\n";
+        printf "The line number must be greater then zero.\\n";
         exit 1;
     elif [ $to_check -gt "$line_count" ];
     then
-        printf "This line doesn't exist.\n";
+        printf "This line doesn't exist.\\n";
         exit 1;
     fi
 }
@@ -243,7 +243,7 @@ remove_line()
     while [ $i -lt $to_remove ];
     do
         line=$( head -$i $filename | tail -n1 | cut -d'.' -f2- );
-        printf "$i.$line\n" >> $filename_temp;
+        printf "$i.$line\\n" >> $filename_temp;
         i=$(( i + 1 ));
     done
 
@@ -253,7 +253,7 @@ remove_line()
         correct_number_checking;
         if [ $remove_till -lt $to_remove ];
         then
-            printf "The first argument must be smaller than the second argument.\n";
+            printf "The first argument must be smaller than the second argument.\\n";
             exit 1;
         fi
             i=$remove_till;
@@ -269,7 +269,7 @@ remove_line()
         fi
         i=$(( i + 1 ));
         line=$( head -$i $filename | tail -n1 | cut -d'.' -f2- );
-        printf "$index.$line\n" >> $filename_temp;
+        printf "$index.$line\\n" >> $filename_temp;
     done
 
     rm $filename;
@@ -295,7 +295,7 @@ edit()
 
     if [[ -z $note ]];
     then
-        printf "The note must be non-empty.\n";
+        printf "The note must be non-empty.\\n";
         exit 1;
     fi
 
@@ -307,13 +307,13 @@ edit()
     while [ $i -lt $to_edit ];
     do
         line=$( head -$i $filename | tail -n1 | cut -d'.' -f2- );
-        printf "$i.$line\n" >> $filename_temp;
+        printf "$i.$line\\n" >> $filename_temp;
         i=$(( i + 1 ));
     done
 
     color=$( head -$to_edit $filename | tail -n1 | cut -d'.' -f2 | cut -d'm' -f1 );
     m='m';
-    edited_note="$to_edit.$color$m$note$white\n";
+    edited_note="$to_edit.$color$m$note$white\\n";
 
     printf "$edited_note" >> $filename_temp;
 
@@ -321,7 +321,7 @@ edit()
     do
         i=$(( i + 1 ));
         line=$( head -$i $filename | tail -n1 | cut -d'.' -f2- );
-        printf "$i.$line\n" >> $filename_temp;
+        printf "$i.$line\\n" >> $filename_temp;
     done
 
     rm $filename;
@@ -335,7 +335,7 @@ check_options_overflow()
 {
     if [[ -n $odd_par ]];
     then
-        printf "Too much arguments!\n";
+        printf "Too much arguments!\\n";
         exit 1;
     fi
 }
@@ -349,12 +349,12 @@ make_backup()
 {
     if [[ -f $filename_backup ]];
     then
-        printf "Backup already exists.\n";
+        printf "Backup already exists.\\n";
         read -p "Do you want to rewrite the backup? [Y/n] " -r;
         if [[ $REPLY =~ ^[Yy]$ ]]
         then
             cp $filename $filename_backup;
-            printf "Success.\n"
+            printf "Success.\\n"
         fi
     else
         cp $filename $filename_backup;
@@ -370,13 +370,13 @@ restore_notes()
 {
     if ! [[ -f $filename_backup ]];
     then
-        printf "No backup file.\n";
+        printf "No backup file.\\n";
     else
         read -p "Do you want to rewrite the notes from backup? [Y/n] " -r;
         if [[ $REPLY =~ ^[Yy]$ ]]
         then
             cp $filename_backup $filename;
-            printf "Success.\n"
+            printf "Success.\\n"
         fi
     fi
 }
@@ -402,7 +402,7 @@ three_dots()
         printf ".";
     done;
     sleep 1;
-    printf "\n"
+    printf "\\n"
 }
 
 # print_ok() is the helping function for
@@ -457,60 +457,60 @@ uninstall()
                 sleep 1.5;
                 clear;
                 print_ok;
-                printf "Unexpectedly loaded daemon systemd.\n";
+                printf "Unexpectedly loaded daemon systemd.\\n";
                 sleep 0.1;
-                printf "\t Lennart Poettering, WTF?\n";
+                printf "\\t Lennart Poettering, WTF?\\n";
                 print_ok;
-                printf "Sent 'WTF' to Lennart Poettering.\n";
+                printf "Sent 'WTF' to Lennart Poettering.\\n";
                 print_ok;
-                printf "Started pretending doing something useful.\n";
+                printf "Started pretending doing something useful.\\n";
                 sleep 0.1;
-                printf "\t Plugging microwave to USB4...\n";
+                printf "\\t Plugging microwave to USB4...\\n";
                 print_failed;
-                printf "Failed to plug microwave.\n";
+                printf "Failed to plug microwave.\\n";
                 print_ok;
-                printf "Sent user's nudes to a random girl.\n";
+                printf "Sent user's nudes to a random girl.\\n";
                 sleep 1;
                 print_ok;
-                printf "Loaded Minecraft with shaders in order to heat the room.\n";
+                printf "Loaded Minecraft with shaders in order to heat the room.\\n";
                 remove_files;
                 print_ok;
-                printf "Removed necessary files (at this point).\n";
+                printf "Removed necessary files (at this point).\\n";
                 print_ok;
-                printf "Made Lenin and Stalin alive.\n";
+                printf "Made Lenin and Stalin alive.\\n";
                 print_ok;
-                printf "Recreated USSR.\n";
+                printf "Recreated USSR.\\n";
                 print_ok;
-                printf "Changed file permissions to accessible for everyone except capitalists.\n";
+                printf "Changed file permissions to accessible for everyone except capitalists.\\n";
                 print_ok;
-                printf "Checked e-mail for the viruses.\n";
+                printf "Checked e-mail for the viruses.\\n";
                 print_ok;
-                printf "Invented the vaccine against AIDS.\n";
+                printf "Invented the vaccine against AIDS.\\n";
                 print_ok;
-                printf "Installed Backbone.js framework.\n";
+                printf "Installed Backbone.js framework.\\n";
                 sleep 0.1;
-                printf "\t Trying to create good project using Backbone.js...\n";
+                printf "\\t Trying to create good project using Backbone.js...\\n";
                 print_failed;
-                printf "Failed to create good project.\n";
+                printf "Failed to create good project.\\n";
                 print_ok;
-                printf "Uninstalled Backbone.js framework.\n";
+                printf "Uninstalled Backbone.js framework.\\n";
                 print_ok;
-                printf "Congratulated user's grandmother on 'Still alive today.'\n";
+                printf "Congratulated user's grandmother on 'Still alive today.'\\n";
                 print_ok;
-                printf "Promised user's mother to visit her again.\n";
+                printf "Promised user's mother to visit her again.\\n";
                 print_ok;
-                printf "Stopped to pretend doing useful actions.\n";
+                printf "Stopped to pretend doing useful actions.\\n";
                 print_ok;
-                printf "Stopped to scare user with systemd-style messages.\n";
+                printf "Stopped to scare user with systemd-style messages.\\n";
                 sleep 2;
             fi
         fi
     else
         phrase1="The files have been corrupted. MW-HA-HA!";
         phrase2="Backup file won't help you.";
-        printf "1. $green$bold$phrase1$white\n" > $filename;
-        printf "1. $green$bold$phrase2$white\n" > $filename_backup;
-        printf "OK\n";
+        printf "1. $green$bold$phrase1$white\\n" > $filename;
+        printf "1. $green$bold$phrase2$white\\n" > $filename_backup;
+        printf "OK\\n";
     fi
 }
 
@@ -543,9 +543,9 @@ choose_terminal()
 
 schedule()
 {
-    if ! [ $(command -v at) ];
+    if ! [ "$(command -v at)" ];
     then
-        printf "This feature requires$green$bold at$white utility.\n";
+        printf "This feature requires$green$bold at$white utility.\\n";
         exit 1;
     elif [[ -z $terminal ]];
     then
@@ -575,11 +575,11 @@ schedule()
             launcher='tilda -c \"bash -c \\\"notebook; sleep 1000000\\\"\"';
             ;;
         '')
-            printf "No terminal is detected.\n";
+            printf "No terminal is detected.\\n";
             exit 1;
             ;;
         *)
-            printf "For $terminal scheduling feature isn't provided yet.\n";
+            printf "For $terminal scheduling feature isn't provided yet.\\n";
             exit 1;
             ;;
 
@@ -598,10 +598,10 @@ schedule()
     printf "#!/bin/sh
 export DISPLAY=$DISPLAY;
 $launcher;
-rm ~/.notebook_files/$sch_name;\n" > ~/.notebook_files/$sch_name;
+rm ~/.notebook_files/$sch_name;\\n" > ~/.notebook_files/$sch_name;
     chmod +x ~/.notebook_files/$sch_name;
 
-    printf "Print time to schedule using$green$bold at$white utility format\n> ";
+    printf "Print time to schedule using$green$bold at$white utility format\\n> ";
     read -r;
     at "$REPLY" -f ~/.notebook_files/$sch_name || rm ~/.notebook_files/$sch_name;
 }
