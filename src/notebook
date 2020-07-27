@@ -195,8 +195,7 @@ clear_notes()
 # correct_number_checking() is the helping
 # function for remove_line()
 # It checks the arguments for:
-# - being the integer, actually;
-# - being positive number;
+# - being the positive integer, actually;
 # - being the existent note number (not greater, than
 #   count of lines in the file)
 
@@ -205,11 +204,7 @@ correct_number_checking()
     number_mask='^[0-9]+$';
     if ! [[ $to_check =~ $number_mask ]];
     then
-        printf "Is \\'$to_check\\' an integer?\\n";
-        exit 1;
-    elif [ $to_check -lt 1 ];
-    then
-        printf "The line number must be greater then zero.\\n";
+        printf "Is \\'$to_check\\' an positive integer?\\n";
         exit 1;
     elif [ $to_check -gt "$line_count" ];
     then
