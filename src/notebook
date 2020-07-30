@@ -73,33 +73,6 @@ cyan="\\e[36m";
 ##### Variables
 
 
-# This variable holds text of note, which
-# is going to be added.
-
-note=;
-
-# This variable is used for checking for
-# odd arguments.
-
-odd_par=;
-
-# For correct number checking.
-
-to_check=;
-
-# Number of note to remove.
-
-to_remove=;
-
-# If you want to remove couple of lines at once,
-# this variable holds last number of note to remove.
-
-remove_till=;
-
-# Number of note to edit.
-
-to_edit=;
-
 # Holds color value. The default is white.
 
 color=$white;
@@ -123,6 +96,7 @@ terminal=;
 
 write_notes()
 {
+    note="$1";
     if [[ -n $note ]];
     then
         number=$( printf "$line_count + 1\\n" | bc );
@@ -140,7 +114,7 @@ write_notes()
 
 choose_color()
 {
-    case $color in
+    case $1 in
 
         'white')
             color=$bold;
@@ -202,11 +176,11 @@ clear_notes()
 correct_number_checking()
 {
     number_mask='^[0-9]+$';
-    if ! [[ $to_check =~ $number_mask ]];
+    if ! [[ $1 =~ $number_mask ]];
     then
         printf "Is \\'$to_check\\' an positive integer?\\n";
         exit 1;
-    elif [ $to_check -gt "$line_count" ];
+    elif [ $1 -gt "$line_count" ];
     then
         printf "This line doesn't exist.\\n";
         exit 1;
@@ -228,8 +202,9 @@ correct_number_checking()
 
 remove_line()
 {
-    to_check=$to_remove;
-    correct_number_checking;
+    to_remove=$1;
+    remove_till=$2;
+    correct_number_checking $to_remove;
 
     touch $filename_temp;
 
@@ -244,8 +219,7 @@ remove_line()
 
     if [[ -n $remove_till ]];
     then
-        to_check=$remove_till;
-        correct_number_checking;
+        correct_number_checking $remove_till;
         if [ $remove_till -lt $to_remove ];
         then
             printf "The first argument must be smaller than the second argument.\\n";
@@ -285,8 +259,9 @@ remove_line()
 
 edit()
 {
-    to_check=$to_edit;
-    correct_number_checking;
+    to_edit=$1;
+    note="$2";
+    correct_number_checking $to_edit;
 
     if [[ -z $note ]];
     then
@@ -328,7 +303,7 @@ edit()
 
 check_options_overflow()
 {
-    if [[ -n $odd_par ]];
+    if [[ -n $1 ]];
     then
         printf "Too much arguments!\\n";
         exit 1;
@@ -647,74 +622,58 @@ case $1 in
 
     '-a' | '--add')
         shift;
-        note=$1;
+        note="$1";
         if [[ $2 == '-p' || $2 == '--paint' ]];
         then
             shift;
             shift;
-            color=$1;
-            choose_color;
+            choose_color $1;
         fi
-        odd_par=$2;
-        check_options_overflow;
-        write_notes;
+        check_options_overflow $2;
+        write_notes "$note";
         ;;
 
     '-r' | '--remove')
         shift;
-        to_remove=$1;
-        shift;
-        remove_till=$1;
-        odd_par=$2;
-        check_options_overflow;
-        remove_line;
+        check_options_overflow $3;
+        remove_line $1 $2;
         ;;
         
     '-e' | '--edit')
         shift;
-        to_edit=$1;
-        shift;
-        note=$1;
-        odd_par=$2;
-        check_options_overflow;
-        edit;
+        check_options_overflow $3;
+        edit $1 "$2";
         ;;
 
     '-b' | '--backup')
-        odd_par=$2;
-        check_options_overflow;
+        check_options_overflow $2;
         make_backup;
         ;;
 
     '-rs' | '--restore')
-        odd_par=$2;
-        check_options_overflow;
+        check_options_overflow $2;
         restore_notes;
         ;;
 
     '-c' | '--clear')
-        odd_par=$2;
-        check_options_overflow;
+        check_options_overflow $2;
         clear_notes;
         ;;
 
     '--uninstall')
-        odd_par=$2;
-        check_options_overflow;
+        check_options_overflow $2;
         uninstall;
         ;;
 
     '-h' | '--help')
-        odd_par=$2;
-        check_options_overflow;
+        check_options_overflow $2;
         usage;
         ;;
 
     '-sch' | '--schedule')
         shift;
         terminal=$1;
-        odd_par=$2;
-        check_options_overflow;
+        check_options_overflow $2;
         schedule;
         ;;
 
