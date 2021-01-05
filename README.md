@@ -2,19 +2,19 @@
 Simple script that allows to make notes inside terminal.
 
 ## Usage
-In order to add some note, write:
+In order to add a note, write:
 ```bash
-$ notebook -a 'Some note'
+$ notebook -a 'A note'
 ```
 The result is:
 ```
-1. Some note
+1. A note
 ```
-If you want to add some color, use -p, like this:
+If you want to color your note, use -p, like this:
 ```bash
-$ notebook -a 'Some note, but colored' -p 'green'
+$ notebook -a 'Another note, but colored' -p 'green'
 ```
-In order to delete the line, use -r:
+In order to delete the note (or some of them), use -r:
 ```bash
 $ notebook
 1. one
@@ -35,7 +35,7 @@ $ notebook
 1. one
 2. six
 ```
-To edit the line, use -e:
+To edit the note, use -e:
 ```bash
 $ notebook
 1. Some note
@@ -58,16 +58,20 @@ Also this script can:
 ## Installation
 The automated installation is possible for Debian and its derivatives, and also for Fedora.
 
-`notebook` depends on `at`, which is resolved in every `install` script.
-### Debian
-No addition package is required. Just launch these commands in the terminal:
+`notebook` depends on scheduling utility `at`, but if you won't use the
+scheduling, you can install the `notebook` without `at`.
+
+In the case of automatic installation `at` is required and checked dependency.
+
+### Debian and derivatives (Ubuntu, Mint, PopOS!, etc.)
+Launch these commands in the terminal:
 ```bash
 $ cd Debian
 $ chmod +x install
 $ ./install
 ```
 ### Fedora
-The necessary package is `rpmdevtools`. If you have not installed it, the script will install 
+Installation script relies on `rpmdevtools`. If you have not installed it, the script will install 
 it automatically.
 
 There are similar installation commands:
