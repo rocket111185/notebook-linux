@@ -491,7 +491,7 @@ uninstall()
 
 choose_terminal()
 {
-    terms=(gnome-terminal lxterminal xterm terminator rxvt Eterm termit xfce4-terminal tilda);
+    terms=(alacritty gnome-terminal lxterminal xterm terminator rxvt Eterm termit xfce4-terminal tilda);
     for t in ${terms[*]};
     do
         if [ "$(command -v "$t")" ];
@@ -526,6 +526,9 @@ schedule()
 
     case $terminal in
 
+        'alacritty')
+            launcher='alacritty --hold --command notebook'
+            ;;
         'gnome-terminal')
             launcher='gnome-terminal -- bash -c "notebook; sleep 1000000"';
             ;;
@@ -573,7 +576,7 @@ rm ~/.notebook_files/$sch_name;\\n" > ~/.notebook_files/$sch_name;
 
     printf "Print time to schedule using$green$bold at$white utility format\\n> ";
     read -r;
-    at "$REPLY" -f ~/.notebook_files/$sch_name || rm ~/.notebook_files/$sch_name;
+    at -f ~/.notebook_files/$sch_name "$REPLY" || rm ~/.notebook_files/$sch_name;
 }
 
 # usage() is the --help section.
